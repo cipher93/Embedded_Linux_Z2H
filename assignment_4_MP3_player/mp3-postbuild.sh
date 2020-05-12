@@ -18,6 +18,7 @@ sed -i 's/PS1=.*/PS1="MP3_Shell>"/' ${TARGET_DIR}/etc/profile
 ##These lines will be added to rcs file to enable our daemon scripts
 sed '5i\ checkForDevices &' ${TARGET_DIR}/etc/init.d/rcS
 sed '6i\ findMP3Players &' ${TARGET_DIR}/etc/init.d/rcS
+sed '7i\ done/etc/init.d/rcS
 
 
 
