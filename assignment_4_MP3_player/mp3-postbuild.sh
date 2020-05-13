@@ -16,9 +16,14 @@ fi
 sed -i 's/PS1=.*/PS1="MP3_Shell>"/' ${TARGET_DIR}/etc/profile
 
 ##These lines will be added to rcs file to enable our daemon scripts
-sed '5i\ checkForDevices &' ${TARGET_DIR}/etc/init.d/rcS
-sed '6i\ findMP3Players &' ${TARGET_DIR}/etc/init.d/rcS
-sed '7i\ done/etc/init.d/rcS
+sed -i "26s/.*/checkForDevices &" 	${TARGET_DIR}/etc/init.d/rcS
+sed -i "27s/.*/findMP3Players &" 	${TARGET_DIR}/etc/init.d/rcS
+sed -i "27s/.*/buttonsScript &" 	${TARGET_DIR}/etc/init.d/rcS
+sed -i "28s/.*/done"		  	${TARGET_DIR}/etc/init.d/rcS
 
-
+#These lines will be added to the config.txt file so that sound will be enabled, we will use echo to write it to the file along with the ">>" modifier to append to the file
+#The first line enables sound in general on the Pi
+#The second line calls the driver of the soundcard that would be used
+echo "dtparam=audio=on" 		>> ${BINARIES_DIR}/rpi-firmware/config.txt
+echo "modprobe snd-bcm2835" 		>> ${BINARIES_DIR}/rpi-firmware/config.txt
 
