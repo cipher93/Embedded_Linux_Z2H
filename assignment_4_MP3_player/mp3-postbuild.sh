@@ -16,7 +16,7 @@ fi
 sed -i 's/PS1=.*/PS1="MP3_Shell>"/' ${TARGET_DIR}/etc/profile
 
 ##These lines will be added to rcs file to enable our daemon scripts
-sed -i 's/done/checkForDevices &' 	${TARGET_DIR}/etc/init.d/rcS
+sed -i 's/done/checkForDevices &/' 	   ${TARGET_DIR}/etc/init.d/rcS
 echo   "findMP3Players &" 		>> ${TARGET_DIR}/etc/init.d/rcS
 echo   "buttonsScript &" 		>>${TARGET_DIR}/etc/init.d/rcS
 echo   "done"		  		>>${TARGET_DIR}/etc/init.d/rcS
@@ -27,3 +27,11 @@ echo   "done"		  		>>${TARGET_DIR}/etc/init.d/rcS
 echo "dtparam=audio=on" 		>> ${BINARIES_DIR}/rpi-firmware/config.txt
 echo "modprobe snd-bcm2835" 		>> ${BINARIES_DIR}/rpi-firmware/config.txt
 
+#Create these symbolic links and give them permissions
+ln -s ${TARGET_DIR}/usr/sbin/checkForDevices 		${TARGET_DIR}/etc/init.d/S03checkForDevices_Link
+ln -s ${TARGET_DIR}/usr/sbin/findMP3Files 		${TARGET_DIR}/etc/init.d/S04findMP3Files_Link
+ln -s ${TARGET_DIR}/usr/sbin/buttonsScript 		${TARGET_DIR}/etc/init.d/S05buttonsScript_Link
+
+chmod 755 ${TARGET_DIR}/etc/init.d/S03checkForDevices_Link
+chmod 755 ${TARGET_DIR}/etc/init.d/S04findMP3Files_Link
+chmod 755 ${TARGET_DIR}/etc/init.d/S05buttonsScript_Link
