@@ -43,6 +43,7 @@ currentStatus=1
 processStarted=0
 #This variable will hold the return of operation checking for a process running in the background
 processRunning=" "
+echo $processRunning
 while :
 do
 
@@ -52,17 +53,19 @@ do
 	#Check for processes running and see if there is an ffplay process running and store it in a variable
 	processRunning=$(ps | grep ffplay)
 	#check if the processRunning variable has anything named ffplay, if it is then assign 1 to processStarted, otherwise keep it at zero
-	if [[ $processRunning =~ "ffplay" ]];
+	if [[ $processRunning =~ "ffplay -nodisp" ]] ;
 	then
 		#Set process started value to 1 because this means the process is in the background already
 		processStarted=1
+		echo zeft_processStarted=1
 	else
 		#Process is not running, set processStarted to 0
 		processStarted=0
+		echo zefteen_processStarted=0
 	fi
 
 	#Now we will choose song depending on the number chosen by the user using buttons (by default, it will be equal to one)
-	desiredSongName=$( head -n $desiredSongNumber availableFiles.txt )
+	desiredSongName=$( head -n $desiredSongNumber /usr/sbin/availableFiles.txt )
 	
 	# previous <<
 	if [ $(cat /sys/class/gpio/gpio2/value) -eq 1 ] ; then 
@@ -75,12 +78,12 @@ do
 		else
 			desiredSongNumber=$((desiredSongNumber-1))
 			#Stop any song currently playing
-			killall -KILL ffplay
+			killall -KILL ffplay >/dev/null 2>&1
 			sleep 0.2
 			#Select chosen song
-			desiredSongName=$( head -n $desiredSongNumber availableFiles.txt )
+			desiredSongName=$( head -n $desiredSongNumber /usr/sbin/availableFiles.txt | tail -1 )
 			#Play song
-			ffplay -nodisp -autoexit $desiredSongName  >/dev/null 2>&1 &
+			ffplay -nodisp -autoexit "$desiredSongName" >/dev/null 2>&1 &
 		fi
 		#We will sleep for a bit to prevent bouncing
 		sleep 0.3
@@ -95,8 +98,9 @@ do
 			aplay /usr/sbin/espeak_commands/play
 			sleep 0.5
 			#Run desired file using ffplay
-			killall -KILL ffplay
-			ffplay -nodisp -autoexit $desiredSongName  >/dev/null 2>&1 &
+			#killall -KILL ffplay >/dev/null 2>&1
+			
+			ffplay -nodisp -autoexit "$desiredSongName"  >/dev/null 2>&1 &
 			#Change process started flag
 			processStarted=1
 		#if a process is already running
@@ -131,19 +135,22 @@ do
 		#Check the total number of songs
 		totalSongsNumber=$( wc -l availableFiles.txt | awk "{print $1}" ) 
 		#Check if we reached the maximum number of songs, if we did so, then keep the number at one. If not, then decrement
-		if [ $desiredSongNumber -eq $totalSongsNumber ]
+		if [ "$desiredSongNumber" == "$totalSongsNumber" ]
 		then
 			desiredSongNumber=$totalSongsNumber
+			echo zeft_next
 		else
+			echo zefteen_next
 			desiredSongNumber=$((desiredSongNumber+1))
+			echo $desiredSongName
 			#Stop any song currently playing
-			killall -KILL ffplay
+			killall -KILL ffplay >/dev/null 2>&1 &
 			sleep 0.2
 			#Select chosen song
-			desiredSongName=$( head -n $desiredSongNumber availableFiles.txt )
+			desiredSongName=$( head -n $desiredSongNumber /usr/sbin/availableFiles.txt | tail -1 )
 			#Play song
-			ffplay -nodisp -autoexit $desiredSongName  >/dev/null 2>&1 &
-			
+			ffplay -nodisp -autoexit "$desiredSongName"  >/dev/null 2>&1 &
+			processStarted=1
 		fi
 		sleep 0.3
 	fi
@@ -153,20 +160,29 @@ do
 		#Say Random
 		aplay /usr/sbin/espeak_commands/random
 		#Calculate total number of songs
-		totalSongsNumber=$( wc -l availableFiles.txt | awk "{print $1}" ) 
+				
+		#totalSongsNumber=$( wc -l availableFiles.txt | awk "{print $1}" ) 
+		totalSongsNumber=$(cat availableFiles.txt | wc -l )
+		echo TotalSongs=$totalSongsNumber
 		#Choose a random song number
-		desiredSongNumber=$(desiredSongNumber+2)
-		if [ $desiredSongNumber -ge $totalSongsNumber ]
+		desiredSongNumber=$((desiredSongNumber+2))
+		echo " "
+		echo DesiredSongNumber=$desiredSongNumber
+		if [[ "$desiredSongNumber" -eq "$totalSongsNumber" ]] #|| [ "$desiredSongNumber" > "$totalSongsNumber" ] 
 		then
 			desiredSongNumber=1
 		fi
+
 		#Stop any song currently playing
-		killall -KILL ffplay
+		killall -KILL ffplay >/dev/null 2>&1 &
 		sleep 0.2
 		#Select chosen song
-		desiredSongName=$( head -n $desiredSongNumber availableFiles.txt )
+		desiredSongName=$( head -n $desiredSongNumber /usr/sbin/availableFiles.txt | tail -1 )
+		echo DesiredSongName  =$desiredSongName
+		echo " "
 		#Play song
-		ffplay -nodisp -autoexit $desiredSongName  >/dev/null 2>&1 &
+		ffplay -nodisp -autoexit "$desiredSongName" >/dev/null 2>&1 &
+		
 		sleep 0.3
 	fi
 
@@ -192,6 +208,5 @@ do
 	fi
 
 MULTILINE-COMMENT
+
 done
-
-
