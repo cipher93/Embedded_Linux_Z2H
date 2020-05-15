@@ -1,0 +1,7 @@
+#!/bin/bash
+
+espeak " next" --stdout > next
+espeak " previous" --stdout > previous
+espeak " play" --stdout > play
+espeak " pause" --stdout > pause
+espeak "random" --stdout > random
