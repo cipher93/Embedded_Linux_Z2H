@@ -10,13 +10,12 @@ do
 	comparator='No Device'
 	echo "$status"
 	#If no device is present, let audio get out from jack
-	if [[ $status =~ "No" ]];
+	if [[ $status =~ "No" ]] ;
 	then
 		echo "Using Headphones"
 		sleep 2 && amixer cset numid=3 1 >/dev/null 2>&1
 	#If a device is found, let the audio get out from HDMI Port	
 	else
-	then
 		echo "Using HDMI"
 		sleep 2 && amixer cset numid=3 2 >/dev/null 2>&1
 	fi
